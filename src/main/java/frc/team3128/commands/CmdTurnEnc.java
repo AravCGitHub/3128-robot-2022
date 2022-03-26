@@ -14,33 +14,43 @@ public class CmdTurnEnc extends CommandBase {
 
     private double initLeftPosMeters, initRightPosMeters;
 
-    public CmdTurnEnc(NAR_Drivetrain drivetrain, double turnMeters) {
+    private double turnDegrees;
+
+    public CmdTurnEnc(NAR_Drivetrain drivetrain, double turnDegrees) {
 
         this.drivetrain = drivetrain;
-        this.turnMeters = turnMeters;
+        this.turnDegrees = turnDegrees;
 
-        initLeftPosMeters = drivetrain.getLeftEncoderDistance();
+        initLeftPosMeters = drivetrain.getLeftEncoderDistance(); //meters
         initRightPosMeters = drivetrain.getRightEncoderDistance();
 
-        initLeftPosMeters = 0.95;
-        initRightPosMeters = 0.95;
-
         addRequirements(drivetrain);
+
+        turnMeters = this.turnDegrees * 0.92155 / 180;
     }
 
     @Override
     public void execute() {
-        if (turnMeters > 0) {
-            drivetrain.tankDrive(-0.3, 0.3);
+        if (turnMeters > 0.1) {
+            drivetrain.tankDrive(-0.15, 0.15);
         } 
         else {
-            drivetrain.tankDrive(0.3, -0.3);
+            drivetrain.tankDrive(0, 0);
         }
+
+        
     }
 
     public boolean isFinished() {
-        return Math.abs(-(drivetrain.getLeftEncoderDistance() - initLeftPosMeters) - (drivetrain.getRightEncoderDistance() - initRightPosMeters)) / 2 < 0.1;
+        //return Math.abs((drivetrain.getLeftEncoderDistance() - initLeftPosMeters) - (drivetrain.getRightEncoderDistance() - initRightPosMeters)) / 2 < 0.1;
         //return (drivetrain.getLeftEncoderDistance() - initLeftPosMeters)
+
+
+
+        if (drivetrain.getLeftEncoderDistance() < -turnMeters || drivetrain.getRightEncoderDistance() > turnMeters) {
+            return true;
+        }
+        else return false;
     }
 
 }

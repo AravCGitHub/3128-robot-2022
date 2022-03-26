@@ -285,7 +285,8 @@ public class RobotContainer {
         m_rightStick.getPOVButton(0).whenPressed(() -> m_shooterLimelight.turnLEDOn());
         m_rightStick.getPOVButton(4).whenPressed(() -> m_shooterLimelight.turnLEDOff());
 
-        m_leftStick.getButton(6).whenPressed(new CmdTurnEnc(m_drive, 0.95295));
+        //m_leftStick.getButton(6).whenPressed(new CmdTurnEnc(m_drive, 180));
+        m_leftStick.getButton(6).whenPressed(new CmdInPlaceTurn(m_drive, 180));
     }
 
     public void init() {
