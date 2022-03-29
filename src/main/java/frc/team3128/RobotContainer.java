@@ -94,7 +94,8 @@ public class RobotContainer {
         "4Ball_Terminal180_ii.wpilib.json",
         "S2H1.wpilib.json", //34
         "Billiards_i.wpilib.json", 
-        "Billiards_ii.wpilib.json" // 36
+        "Billiards_ii.wpilib.json", // 36
+        "3Ball_Terminal180_i.wpilib.json"
     };
     private Trajectory[] trajectory = new Trajectory[trajJson.length];
     
@@ -108,7 +109,25 @@ public class RobotContainer {
 
     private HashMap<Command, Pose2d> initialPoses;
 
-    private Command auto_1Ball, auto_2BallTop, auto_2BallMid, auto_2BallBot, auto_3BallTerminal, auto_3BallHook, auto_3BallHersheyKiss, auto_3BallBack, auto_4BallE, auto_4BallTerm, auto_5Ball, auto_3Ball180, auto_S2H1, auto_S2H2, auto_4Ball180, auto_5Ball180, auto_Billiards;
+    private Command 
+    auto_1Ball,
+    auto_2BallTop,
+    auto_2BallMid,
+    auto_2BallBot,
+    auto_3BallTerminal,
+    auto_3BallHook,
+    auto_3BallHersheyKiss,
+    auto_3BallBack,
+    auto_4BallE,
+    auto_4BallTerm,
+    auto_5Ball,
+    auto_3Ball180,
+    auto_S2H1,
+    auto_S2H2,
+    auto_4Ball180,
+    auto_5Ball180,
+    auto_Billiards,
+    auto_3Ball180Terminal;
 
     private boolean DEBUG = true;
     private boolean driveHalfSpeed = false;
@@ -767,31 +786,58 @@ public class RobotContainer {
 
         auto_Billiards = new SequentialCommandGroup (
                             // initial position: (6.8, 6.272, 40 deg - should be approx. pointing straight at the ball to knock)
+                            
+                            //snipe opponent ball
                             new SequentialCommandGroup(
                                 new CmdExtendIntake(m_intake),
                                 new CmdReverseIntake(m_intake, m_hopper)
                             ).withTimeout(2),
 
+                            //turn
                             new CmdInPlaceTurn(m_drive, 85),
 
-                            new ParallelDeadlineGroup(
-                                trajectoryCmd(34),
-                                new CmdExtendIntakeAndRun(m_intake, m_hopper)
-                            ),
-
-                            new CmdInPlaceTurn(m_drive, 55),
-
-                            shootCmd(1000, 28),
-
+                            //intake opponent ball
                             new ParallelDeadlineGroup(
                                 trajectoryCmd(35),
                                 new CmdExtendIntakeAndRun(m_intake, m_hopper)
                             ),
 
+                            //turn
+                            new CmdInPlaceTurn(m_drive, 55),
+
+                            //shoot
+                            shootCmd(1000, 28),
+
+                            //intake team ball
+                            new ParallelDeadlineGroup(
+                                trajectoryCmd(36),
+                                new CmdExtendIntakeAndRun(m_intake, m_hopper)
+                            ),
+
+                            //turn
                             new CmdInPlaceTurn(m_drive, 96),
 
+                            //shoot
                             alignShootCmd()
-);
+        );
+
+        auto_3Ball180Terminal = new SequentialCommandGroup(
+
+                            //shoot preloaded and turn
+                            shootCmd(),
+                            new CmdInPlaceTurn(m_drive, 180),
+
+                            //drive to termianl
+                            trajectoryCmd(37),
+
+                            //intake ball
+                            new CmdExtendIntakeAndRun(m_intake, m_hopper).withTimeout(2),
+
+                            //drive to tarmac and shoot
+                            trajectoryCmd(31),
+                            new CmdInPlaceTurn(m_drive, 180),
+                            alignShootCmd()
+        );
 
 
         // Setup auto-selector
@@ -949,7 +995,7 @@ public class RobotContainer {
         initialPoses.put(auto_3BallBack, trajectory[23].getInitialPose());
         initialPoses.put(auto_3Ball180, new Pose2d(trajectory[25].getInitialPose().getX(), trajectory[25].getInitialPose().getY(), trajectory[25].getInitialPose().getRotation().unaryMinus()));
         initialPoses.put(auto_4Ball180, new Pose2d(trajectory[32].getInitialPose().getX(), trajectory[32].getInitialPose().getY(), trajectory[32].getInitialPose().getRotation().unaryMinus()));
-        initialPoses.put(auto_5Ball180, new Pose2d(trajectory[25].getInitialPose().getX(), trajectory[25].getInitialPose().getY(), trajectory[25].getInitialPose().getRotation().unaryMinus()));
+        initialPoses.put(auto_5Ball180, new Pose2d(8.93, 1514, new Rotation2d(-1.40678985334)));
         initialPoses.put(auto_S2H1, new Pose2d(trajectory[26].getInitialPose().getX(), trajectory[26].getInitialPose().getY(), trajectory[26].getInitialPose().getRotation().unaryMinus()));
         initialPoses.put(auto_S2H2, new Pose2d(trajectory[26].getInitialPose().getX(), trajectory[26].getInitialPose().getY(), trajectory[26].getInitialPose().getRotation().unaryMinus()));
         initialPoses.put(auto_Billiards, new Pose2d(6.8, 6.272, Rotation2d.fromDegrees(40)));
