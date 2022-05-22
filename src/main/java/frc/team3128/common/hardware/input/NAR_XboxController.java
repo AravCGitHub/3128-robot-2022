@@ -1,18 +1,28 @@
 package frc.team3128.common.hardware.input;
 
+import java.util.HashMap;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
-/**
- * Wrapper for the WPILib Joystick class. Works with Logitech Extreme 3D Pro and Thrustmaster T16000M.
- * 
- */
 
 public class NAR_XboxController extends XboxController {
 
     private XboxController controller;
 
-    private JoystickButton buttons[] = new JoystickButton[10];   
+    private String buttonNames[] = {
+        "A",
+        "B",
+        "X",
+        "Y",
+        "LeftBumper",
+        "RightBumper",
+        "Back",
+        "Start",
+        "LeftStick",
+        "RightStick"
+    };
+    
+    private HashMap<String, JoystickButton> buttons;
 
     public NAR_XboxController(int port) {
         super(port);
@@ -20,12 +30,12 @@ public class NAR_XboxController extends XboxController {
         controller = new XboxController(port);
 
         for (int i = 0; i < 10; i++) {
-            buttons[i] = new JoystickButton(controller, i + 1);
+            buttons.put(buttonNames[i], new JoystickButton(controller, i));
         }   
     }
 
-    public JoystickButton getXboxButton(int buttonNum) {
-        return buttons[buttonNum - 1];
+    public JoystickButton getButton(String buttonName) {
+        return buttons.get(buttonName);
     }
 
 }
