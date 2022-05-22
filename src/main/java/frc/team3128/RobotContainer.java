@@ -54,6 +54,7 @@ import frc.team3128.commands.CmdShootRPM;
 import frc.team3128.commands.CmdShootSingleBall;
 import frc.team3128.commands.CmdSwerveDrive;
 import frc.team3128.common.hardware.input.NAR_Joystick;
+import frc.team3128.common.hardware.input.NAR_XboxController;
 import frc.team3128.common.hardware.limelight.Limelight;
 import frc.team3128.common.hardware.limelight.LimelightKey;
 import frc.team3128.common.narwhaldashboard.NarwhalDashboard;
@@ -83,8 +84,8 @@ public class RobotContainer {
     private Climber m_climber;
     private Hood m_hood;
 
-    public final XboxController driverController;
-    public final XboxController operatorController;
+    private NAR_XboxController m_driverController;
+    private NAR_XboxController m_operatorController;
 
     private CommandScheduler m_commandScheduler = CommandScheduler.getInstance();
 
@@ -152,10 +153,10 @@ public class RobotContainer {
 
         //Enable all PIDSubsystems so that useOutput runs
         // m_shooter.enable();
-        // m_hood.enable();
+        // m_hood.enable(); 
 
-        driverController = new XboxController(0); // Not sure about port number
-        operatorController = new XboxController(1); // Not sure about port number 
+        m_driverController = new NAR_XboxController(0);
+        m_operatorController = new NAR_XboxController(1);
 
         // m_shooterLimelight = new Limelight("limelight-cog", VisionConstants.TOP_CAMERA_ANGLE, 
         //                                                      VisionConstants.TOP_CAMERA_HEIGHT, 
@@ -164,7 +165,7 @@ public class RobotContainer {
         //                                                 VisionConstants.BALL_LL_HEIGHT, 
         //                                                 VisionConstants.BALL_LL_FRONT_DIST, 0);
 
-        m_commandScheduler.setDefaultCommand(m_drive, new CmdSwerveDrive(m_drive, driverController::getLeftX, driverController::getLeftY, driverController::getRightX /* Turning */, true)); 
+        m_commandScheduler.setDefaultCommand(m_drive, new CmdSwerveDrive(m_drive, m_driverController::getLeftX, m_driverController::getLeftY, m_driverController::getRightX /* Turning */, true)); 
         //m_commandScheduler.setDefaultCommand(m_hopper, new CmdHopperDefault(m_hopper, m_shooter::isReady)); //TODO: make input into this good method ???
         //initAutos();
         // initDashboard();
@@ -181,20 +182,18 @@ public class RobotContainer {
 
         // Driver Controller
 
-        // Unsure about how to make a trigger instead of a button
-        // For now it is just a button, will be changed in future
         // Bindings are all button A, will be adjusted in the future
-        // Also will clean it up more, making variables for each button
 
-        new JoystickButton(driverController, XboxController.Button.kA.value).whenPressed(shootCommand) // Should be right trigger
+        m_driverController.getXboxButton(XboxController.Button.kA.value).whenPressed(shootCommand) // Should be right trigger
                                 .whenReleased(new ParallelCommandGroup(
                                     new InstantCommand(m_shooter::stopShoot, m_shooter),
                                     new InstantCommand(m_shooterLimelight::turnLEDOff)));
         // new JoystickButton(driverController, XboxController.Button.kA.value).whenPressed(new SequentialCommandGroup(new CmdRetractHopper(m_hopper).withTimeout(0.5), new ParallelCommandGroup(new InstantCommand(() -> m_hood.startPID(12)), new CmdShootRPM(m_shooter, 2700), new CmdHopperShooting(m_hopper, m_shooter::isReady))))
         //                             .whenReleased(new ParallelCommandGroup(new InstantCommand(m_shooter::stopShoot, m_shooter)));
 
-        new JoystickButton(driverController, XboxController.Button.kA.value).whenHeld(new CmdExtendIntakeAndRun(m_intake, m_hopper)) // Should be left trigger
+        m_driverController.getXboxButton(XboxController.Button.kA.value).whenHeld(new CmdExtendIntakeAndRun(m_intake, m_hopper)) // Should be left trigger
                                 .whenReleased(new CmdIntakeCargo(m_intake, m_hopper).withTimeout(0.25));
+        
         
         // new JoystickButton(driverController, XboxController.Button.kA.value).whenHeld(new ParallelCommandGroup(
         //                                     new CmdBallJoystickPursuit(m_drive, m_ballLimelight, m_rightStick::getY, m_rightStick::getTwist, m_rightStick::getThrottle),
@@ -209,9 +208,9 @@ public class RobotContainer {
         // Bindings are all button A, will be adjusted in the future
         // Also will clean it up more, making variables for each button
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenHeld(lowerHubShoot);
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenHeld(lowerHubShoot);
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new SequentialCommandGroup(
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new SequentialCommandGroup(
                                                 new CmdRetractHopper(m_hopper).withTimeout(0.5), 
                                                 new ParallelCommandGroup(
                                                         new InstantCommand(() -> m_hood.startPID(7)),
@@ -219,24 +218,24 @@ public class RobotContainer {
                                                         new CmdHopperShooting(m_hopper, m_shooter::isReady))))
                                     .whenReleased(new ParallelCommandGroup(new InstantCommand(m_shooter::stopShoot, m_shooter)));
 
-        //new JoystickButton(operatorController, XboxController.Button.kA.value).whenHeld(lowerHubShoot);
+        //m_operatorController.getXboxButton(XboxController.Button.kA.value).whenHeld(lowerHubShoot);
 
-        //new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(climbCommand);
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(climbTraversalCommand);
+        //m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(climbCommand);
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(climbTraversalCommand);
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new CmdClimbEncoder(m_climber, ClimberConstants.CLIMB_ENC_TO_TOP));
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new CmdClimbEncoder(m_climber, ClimberConstants.CLIMB_ENC_TO_TOP));
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new CmdClimbEncoder(m_climber, 0));
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new CmdClimbEncoder(m_climber, 0));
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenHeld(extendIntakeAndReverse);
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenHeld(extendIntakeAndReverse);
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::bothStop, m_climber));
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::bothStop, m_climber));
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(() -> m_hood.startPID(HoodConstants.MIN_ANGLE));
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(() -> m_hood.startPID(HoodConstants.MAX_ANGLE));
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(() -> m_hood.startPID(HoodConstants.MIN_ANGLE));
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(() -> m_hood.startPID(HoodConstants.MAX_ANGLE));
 
 
-        // new JoystickButton(operatorController, XboxController.Button.kA.value).whenHeld(new SequentialCommandGroup(
+        // m_operatorController.getXboxButton(XboxController.Button.kA.value).whenHeld(new SequentialCommandGroup(
         //     new CmdRetractHopper(m_hopper),
         //     new InstantCommand(() -> m_shooter.setState(ShooterState.UPPERHUB)),
         //     new ParallelCommandGroup(
@@ -244,7 +243,7 @@ public class RobotContainer {
         //         new CmdHopperShooting(m_hopper, m_shooter::isReady),
         //         new CmdShootRPM(m_shooter, 3000))));
 
-        // new JoystickButton(operatorController, XboxController.Button.kA.value).whenHeld(new SequentialCommandGroup(
+        // m_operatorController.getXboxButton(XboxController.Button.kA.value).whenHeld(new SequentialCommandGroup(
         //     new CmdRetractHopper(m_hopper).withTimeout(0.5),
         //     new InstantCommand(() -> m_shooter.setState(ShooterState.UPPERHUB)),
         //     new ParallelCommandGroup(
@@ -252,7 +251,7 @@ public class RobotContainer {
         //         new CmdHopperShooting(m_hopper, m_shooter::isReady),
         //         new CmdShootRPM(m_shooter, 4000))));
                
-        // new JoystickButton(operatorController, XboxController.Button.kA.value).whenHeld(new SequentialCommandGroup(
+        // m_operatorController.getXboxButton(XboxController.Button.kA.value).whenHeld(new SequentialCommandGroup(
         //     new CmdRetractHopper(m_hopper).withTimeout(0.5),
         //     new InstantCommand(() -> m_shooter.setState(ShooterState.UPPERHUB)),
         //     new ParallelCommandGroup(
@@ -260,7 +259,7 @@ public class RobotContainer {
         //         new CmdHopperShooting(m_hopper, m_shooter::isReady),
         //         new CmdShootRPM(m_shooter, 5000))));
 
-        // new JoystickButton(operatorController, XboxController.Button.kA.value).whenHeld(new SequentialCommandGroup(
+        // m_operatorController.getXboxButton(XboxController.Button.kA.value).whenHeld(new SequentialCommandGroup(
         //     new CmdRetractHopper(m_hopper).withTimeout(0.5),
         //     new InstantCommand(() -> m_shooter.setState(ShooterState.UPPERHUB)),
         //     new ParallelCommandGroup(
@@ -268,13 +267,13 @@ public class RobotContainer {
         //         new CmdHopperShooting(m_hopper, m_shooter::isReady),
         //         new CmdShootRPM(m_shooter, 5500))));
 
-        // new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new CmdExtendIntake(m_intake));
-        // new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(() -> m_intake.retractIntake());
+        // m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new CmdExtendIntake(m_intake));
+        // m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(() -> m_intake.retractIntake());
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(() -> m_shooter.ratio += 50);
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(() -> m_shooter.ratio -= 50);
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(() -> m_shooter.ratio += 50);
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(() -> m_shooter.ratio -= 50);
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new SequentialCommandGroup(
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new SequentialCommandGroup(
                             new CmdRetractHopper(m_hopper).withTimeout(0.5), 
                             new ParallelCommandGroup(
                                     new InstantCommand(() -> m_hood.startPID(ConstantsInt.ShooterConstants.SET_ANGLE)),
@@ -282,44 +281,44 @@ public class RobotContainer {
                                     new CmdHopperShooting(m_hopper, m_shooter::isReady))))
                 .whenReleased(new ParallelCommandGroup(new InstantCommand(m_shooter::stopShoot, m_shooter)));
 
-        // new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new SequentialCommandGroup(new CmdRetractHopper(m_hopper), new ParallelCommandGroup(new InstantCommand(() -> m_hood.startPID(3)), new CmdShootRPM(m_shooter, 2800), new CmdHopperShooting(m_hopper, m_shooter::isReady))))
+        // m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new SequentialCommandGroup(new CmdRetractHopper(m_hopper), new ParallelCommandGroup(new InstantCommand(() -> m_hood.startPID(3)), new CmdShootRPM(m_shooter, 2800), new CmdHopperShooting(m_hopper, m_shooter::isReady))))
         //                             .whenReleased(new ParallelCommandGroup(new InstantCommand(m_shooter::stopShoot, m_shooter)));
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::resetLeftEncoder, m_climber));        
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::resetLeftEncoder, m_climber));        
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(() -> driveHalfSpeed = !driveHalfSpeed);
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(() -> driveHalfSpeed = !driveHalfSpeed);
 
         // m_leftStick.getButton(5).whenPressed(new CmdClimbEncoder(m_climber, -m_climber.getDesiredTicks(ClimberConstants.SMALL_VERTICAL_DISTANCE)));
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::bothManualExtend, m_climber))
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::bothManualExtend, m_climber))
                                 .whenReleased(new InstantCommand(m_climber::bothStop, m_climber));
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::bothManualRetract, m_climber))
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::bothManualRetract, m_climber))
                                 .whenReleased(new InstantCommand(m_climber::bothStop, m_climber));
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::bothExtend, m_climber))
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::bothExtend, m_climber))
                                 .whenReleased(new InstantCommand(m_climber::bothStop, m_climber));
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::bothRetract, m_climber))
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::bothRetract, m_climber))
                                 .whenReleased(new InstantCommand(m_climber::bothStop, m_climber));
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::extendPiston, m_climber));
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::retractPiston, m_climber));
-        // new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::engageBreak, m_climber));
-        // new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::disengageBreak, m_climber));
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::extendPiston, m_climber));
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::retractPiston, m_climber));
+        // m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::engageBreak, m_climber));
+        // m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new InstantCommand(m_climber::disengageBreak, m_climber));
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new CmdClimbEncoder(m_climber, ClimberConstants.CLIMB_ENC_DIAG_EXTENSION));
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new CmdClimbEncoder(m_climber, ClimberConstants.CLIMB_ENC_TO_TOP));
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(new CmdClimbEncoder(m_climber, -120));
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new CmdClimbEncoder(m_climber, ClimberConstants.CLIMB_ENC_DIAG_EXTENSION));
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new CmdClimbEncoder(m_climber, ClimberConstants.CLIMB_ENC_TO_TOP));
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(new CmdClimbEncoder(m_climber, -120));
 
         // should probably remove this
         //m_leftStick.getPOVButton(0).whenPressed(() -> m_drive.resetPose());
 
         // m_leftStick.getButton(4).whenPressed(() -> m_hood.startPID(31));
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(() -> m_hood.zeroEncoder());
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(() -> m_hood.zeroEncoder());
 
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(() -> m_shooterLimelight.turnLEDOn());
-        new JoystickButton(operatorController, XboxController.Button.kA.value).whenPressed(() -> m_shooterLimelight.turnLEDOff());
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(() -> m_shooterLimelight.turnLEDOn());
+        m_operatorController.getXboxButton(XboxController.Button.kA.value).whenPressed(() -> m_shooterLimelight.turnLEDOff());
     }
 
     public void init() {
