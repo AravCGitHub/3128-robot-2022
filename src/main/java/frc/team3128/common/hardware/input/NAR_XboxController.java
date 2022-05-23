@@ -8,8 +8,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class NAR_XboxController extends XboxController {
 
-    private XboxController controller;
-
     private String buttonNames[] = {
         "A",
         "B",
@@ -28,10 +26,8 @@ public class NAR_XboxController extends XboxController {
     public NAR_XboxController(int port) {
         super(port);
 
-        controller = new XboxController(port);
-
         for (int i = 0; i < 10; i++) {
-            buttons.put(buttonNames[i], new JoystickButton(controller, i));
+            buttons.put(buttonNames[i], new JoystickButton(this, i));
         }   
     }
 
@@ -40,11 +36,11 @@ public class NAR_XboxController extends XboxController {
     }
 
     public Trigger getLeftTrigger() {
-        return new Trigger (() -> controller.getLeftTriggerAxis() >= 0.5);
+        return new Trigger (() -> getLeftTriggerAxis() >= 0.5);
     }
 
     public Trigger getRightTrigger() {
-        return new Trigger (() -> controller.getRightTriggerAxis() >= 0.5);
+        return new Trigger (() -> getRightTriggerAxis() >= 0.5);
     }
 
 }
