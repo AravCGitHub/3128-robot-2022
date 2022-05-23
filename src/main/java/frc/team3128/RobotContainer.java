@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -31,7 +30,7 @@ import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.team3128.Constants.HoodConstants;
 import frc.team3128.Constants.SwerveConstants;
 import frc.team3128.ConstantsInt.ClimberConstants;
@@ -181,18 +180,16 @@ public class RobotContainer {
     private void configureDriverBindings() { // Some commented commands
 
         // Driver Controller
-
-        // Bindings are all LeftBumper, will be adjusted in the future
         
-        m_driverController.getButton("LeftBumper").whenPressed(shootCommand) // Should be right trigger
-                                .whenReleased(new ParallelCommandGroup(
+        m_driverController.getLeftTrigger().whenActive(shootCommand) 
+                                .whenInactive(new ParallelCommandGroup(
                                     new InstantCommand(m_shooter::stopShoot, m_shooter),
                                     new InstantCommand(m_shooterLimelight::turnLEDOff)));
         // new JoystickButton(driverController, "LeftBumper").whenPressed(new SequentialCommandGroup(new CmdRetractHopper(m_hopper).withTimeout(0.5), new ParallelCommandGroup(new InstantCommand(() -> m_hood.startPID(12)), new CmdShootRPM(m_shooter, 2700), new CmdHopperShooting(m_hopper, m_shooter::isReady))))
         //                             .whenReleased(new ParallelCommandGroup(new InstantCommand(m_shooter::stopShoot, m_shooter)));
-
-        m_driverController.getButton("LeftBumper").whenHeld(new CmdExtendIntakeAndRun(m_intake, m_hopper)) // Should be left trigger
-                                .whenReleased(new CmdIntakeCargo(m_intake, m_hopper).withTimeout(0.25));
+        
+        m_driverController.getRightTrigger().whileActiveOnce(new CmdExtendIntakeAndRun(m_intake, m_hopper)) 
+                                .whenInactive(new CmdIntakeCargo(m_intake, m_hopper).withTimeout(0.25));
         
         
         // new JoystickButton(driverController, "LeftBumper").whenHeld(new ParallelCommandGroup(
@@ -201,7 +198,7 @@ public class RobotContainer {
         //                                 );
     }
 
-    private void configureOperatorBindings() { // Way too many commented commands
+    private void configureOperatorBindings() { // Many commented commands
 
         // Operator Controller
 

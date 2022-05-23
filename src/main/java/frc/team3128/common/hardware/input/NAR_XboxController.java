@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class NAR_XboxController extends XboxController {
 
@@ -36,6 +37,14 @@ public class NAR_XboxController extends XboxController {
 
     public JoystickButton getButton(String buttonName) {
         return buttons.get(buttonName);
+    }
+
+    public Trigger getLeftTrigger() {
+        return new Trigger (() -> controller.getLeftTriggerAxis() >= 0.5);
+    }
+
+    public Trigger getRightTrigger() {
+        return new Trigger (() -> controller.getRightTriggerAxis() >= 0.5);
     }
 
 }
