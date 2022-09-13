@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -34,6 +35,7 @@ import frc.team3128.common.hardware.limelight.LEDMode;
 import frc.team3128.common.hardware.limelight.Limelight;
 import frc.team3128.common.narwhaldashboard.NarwhalDashboard;
 import frc.team3128.common.utility.Log;
+import frc.team3128.common.utility.NAR_Shuffleboard;
 import frc.team3128.subsystems.Climber;
 import frc.team3128.subsystems.Hood;
 import frc.team3128.subsystems.Hopper;
@@ -188,6 +190,7 @@ public class RobotContainer {
     }
 
     private void initDashboard() {
+        NAR_Shuffleboard.addData("General","Aluminum",m_drive.getHeading(),m_drive::getHeading);
         if (DEBUG) {
             SmartDashboard.putData("CommandScheduler", CommandScheduler.getInstance());
             SmartDashboard.putData("Drivetrain", m_drive);

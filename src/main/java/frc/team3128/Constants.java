@@ -278,4 +278,14 @@ public class Constants {
         public static final double BALL_VEL_THRESHOLD = 2.54; // m/s - 100 in/s 
         public static final int BALL_VEL_PLATEAU_THRESHOLD = 10;
     }
+
+    public static class Shuffleboard_Constants {
+        public static final String [] TabNames = new String[]
+        {
+            "General",
+            "Shooting",
+            "Driving"
+        };
+    }
+
 }

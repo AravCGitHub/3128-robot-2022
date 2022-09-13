@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.team3128.autonomous.AutoPrograms;
+import frc.team3128.common.utility.NAR_Shuffleboard;
 import frc.team3128.subsystems.NAR_Drivetrain;
 
 /**
@@ -31,6 +32,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic(){
+        NAR_Shuffleboard.update();
         m_robotContainer.updateDashboard();        
     }
 
