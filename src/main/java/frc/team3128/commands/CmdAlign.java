@@ -115,4 +115,6 @@ public class CmdAlign extends CommandBase {
     public boolean isFinished() {
         return isAligned;
     }
+
+    // jj
 }
