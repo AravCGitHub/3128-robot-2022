@@ -43,4 +43,6 @@ public class NAR_XboxController extends XboxController {
         return new Trigger (() -> getRightTriggerAxis() >= 0.5);
     }
 
+    // kk
+
 }
