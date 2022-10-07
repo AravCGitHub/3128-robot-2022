@@ -35,7 +35,7 @@ public class NAR_Joystick {
 
         for (int i = 0; i < 16; i++) {
             int buttonId = i;
-            buttons[buttonId] = new Trigger(()->stick.getRawButton(buttonId)); 
+            buttons[buttonId] = new Trigger(()->stick.getRawButton(buttonId+1)); 
         }
             
         for (int i = 0; i < 8; i++) {

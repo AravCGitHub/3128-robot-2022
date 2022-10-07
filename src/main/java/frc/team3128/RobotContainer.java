@@ -92,8 +92,8 @@ public class RobotContainer {
         m_commandScheduler.setDefaultCommand(m_drive, new CmdArcadeDrive(m_rightStick::getY, m_rightStick::getTwist, m_rightStick::getThrottle));
 
         initDashboard();
-        // configureButtonBindings();
         configureDriverOperator();
+        // configureButtonBindings();
         
         if(RobotBase.isSimulation())
             DriverStation.silenceJoystickConnectionWarning(true);
@@ -230,16 +230,16 @@ public class RobotContainer {
 
         // RIGHT 
 
-        m_rightStick.getButton(5).whenPressed(() -> m_hood.zeroEncoder()); 
+        m_rightStick.getButton(5).whenActive(() -> m_hood.zeroEncoder()); 
 
-        m_rightStick.getButton(6).whenPressed(() -> m_climber.resetLeftEncoder());
+        m_rightStick.getButton(6).whenActive(() -> m_climber.resetLeftEncoder());
 
-        m_rightStick.getButton(13).whenPressed(() -> m_hood.startPID(MIN_ANGLE));
+        m_rightStick.getButton(13).whenActive(() -> m_hood.startPID(MIN_ANGLE));
 
-        m_rightStick.getButton(14).whenPressed(() -> m_hood.startPID(MAX_ANGLE));
+        m_rightStick.getButton(14).whenActive(() -> m_hood.startPID(MAX_ANGLE));
 
-        m_rightStick.getUpPOVButton().whenPressed(() -> m_ll.turnShooterLEDOn());
-        m_rightStick.getDownPOVButton().whenPressed(() -> m_ll.turnShooterLEDOff());
+        m_rightStick.getUpPOVButton().whenActive(() -> m_ll.turnShooterLEDOn());
+        m_rightStick.getDownPOVButton().whenActive(() -> m_ll.turnShooterLEDOff());
 
         isShooting.debounce(0.1).whenActive(new InstantCommand(m_hopper::runHopper, m_hopper))
                                         .whenInactive(new InstantCommand(m_hopper::stopHopper, m_hopper));
